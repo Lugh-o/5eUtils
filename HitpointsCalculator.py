@@ -1,45 +1,38 @@
 import DiceRoll
 
-def getHitdie(characterClass):
-    #hitdie[0] -> die
-    #hitdie[1] -> avg
-    match characterClass:
-        case "Wizard" | "Sorcerer":
-            hitDie = [6, 4]
-        case "Artificer" | "Bard" | "Cleric" | "Druid" | "Monk" | "Rogue":
-            hitDie = [8, 5]
-        case "Fighter" | "Paladin" | "Ranger": 
-            hitDie = [10, 6]
-        case "Barbarian":
-            hitDie = [12, 7]
-        case _:
-            return -1
-    return hitDie
-
-def classLevelUp(hitDie, conMod, useAverage, hasTough, isHillDwarf, isFirst):
-    #hitdie[0] -> die
-    #hitdie[1] -> avg
-    if isFirst:
-        hpIncrease = hitDie[0] + conMod
-    elif useAverage:
-        hpIncrease = hitDie[1] + conMod
-    else:
-        hpIncrease = DiceRoll.roll(hitDie[0], 1) + conMod
+def calcHP(startingDie, conMod, lvlAfterFirst, hasTough, isHillDwarf, useAverage):
+    #First level
+    hp = startingDie + conMod + hasTough*2 + isHillDwarf
     
-    if isHillDwarf:
-        hpIncrease += 1
-        
-    if hasTough:
-        hpIncrease += 2
-    
-    if hpIncrease < 0:
-        hpIncrease = 1
-        
-    return hpIncrease
+    for index, level in enumerate(lvlAfterFirst):
+        # lvlAfterFirst= 
+        # [Wizard, Sorcerer, Artificer, Bard, Cleric, Druid, Monk, Rogue, Fighter, Paladin, Ranger, Barbarian]
+            #hitdie[0] -> die
+            #hitdie[1] -> avg
+        match index:
+            case 0|1:
+                hitDie = [6, 4]
+            case 2|3|4|5|6|7:
+                hitDie = [8, 5]
+            case 8|9|10:
+                hitDie = [10, 6]
+            case 11:
+                hitDie = [12,7]
+            case _:
+                return -1      
+            
+        if useAverage:
+            hpIncrease = hitDie[1] + conMod + hasTough*2 + isHillDwarf
+        else:
+            diceResult = DiceRoll.roll(hitDie[0], 1)
+            if diceResult is str:
+                return -1        
+            hpIncrease = diceResult[0] + conMod + hasTough*2 + isHillDwarf
    
-def hpCalc(characterClass, conMod, useAverage, hasTough, isHillDwarf, level):
-    hitDie = getHitdie(characterClass)
-    hpTotal = classLevelUp(hitDie, conMod, useAverage, hasTough, isHillDwarf, True)
-    for _ in range(level-1):
-        hpTotal += classLevelUp(hitDie, conMod, useAverage, hasTough, isHillDwarf, False)
-    return hpTotal
+        if hpIncrease < 0:
+            hpIncrease = 1
+        
+        hpIncrease *= level
+        hp += hpIncrease
+    return hp
+   
