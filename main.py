@@ -51,9 +51,9 @@ def CalculateHitpoints():
             case "Barbarian":
                 startingDie = 12
     
-                    
         hpResult = calcHP(startingDie, conModifier, lvlAfterFirst, hasTough.get(), isHillDwarf.get(), useAverage.get())
         hpResultField.insert(END, f"{hpResult}\n")
+        
     except ValueError:
         hpResultField.insert(END, "Invalid input. Please enter valid numbers.\n")
         return 0
@@ -94,7 +94,7 @@ class HitpointsCalculator(Page):
         super().__init__(*args, **kwargs)
         
         firstFrame = Frame(self)
-        firstFrame.pack(pady=30, side='top')
+        firstFrame.pack(pady=10, side='top', anchor='nw')
         validate_cmd = (firstFrame.register(validate_int), '%P')    
         
         classes = ["Wizard", "Sorcerer", "Artificer", "Bard", 
@@ -117,12 +117,12 @@ class HitpointsCalculator(Page):
         self.conMod.insert(0, "0")
         
         afterFrame = Frame(self)
-        afterFrame.pack(pady=30, side='top', anchor='center')
+        afterFrame.pack(pady=5, side='top', anchor='w')
         
         validate_cmd = (afterFrame.register(validate_int), '%P')
         
         self.afterLabel = Label(afterFrame, text="Levels After the First")
-        self.afterLabel.grid(row=1, column=3, padx=5, columnspan=2)
+        self.afterLabel.grid(row=1, column=0, padx=5, pady = 15, columnspan=2)
         
         self.wizardLabel = Label(afterFrame, text="Wizard")
         self.wizardLabel.grid(row=2, column=0, padx=5)
@@ -196,29 +196,33 @@ class HitpointsCalculator(Page):
         self.barbarianLevel.grid(row=4, column=7, padx=5)   
         self.barbarianLevel.insert(0, "0")
         
+        boolFrame = Frame(self)
+        boolFrame.pack(pady=5, side='top', anchor='w')
+        
         global hasTough, isHillDwarf, useAverage
 
         hasTough = BooleanVar()
-        self.toughLabel = Label(afterFrame, text="Do you have the Tough feat?")
+        self.toughLabel = Label(boolFrame, text="Do you have the Tough feat?")
         self.toughLabel.grid(row=5, column=0, padx=5)
-        Checkbutton(afterFrame, text='', variable= hasTough, onvalue=True, offvalue=False).grid(row=5, column=1)    
+        Checkbutton(boolFrame, text='', variable= hasTough, onvalue=True, offvalue=False).grid(row=5, column=1)    
                
         isHillDwarf = BooleanVar()
-        self.dwarfLabel = Label(afterFrame, text="Are you a Hill Dwarf?")
+        self.dwarfLabel = Label(boolFrame, text="Are you a Hill Dwarf?")
         self.dwarfLabel.grid(row=6, column=0, padx=5)
-        Checkbutton(afterFrame, text='', variable= isHillDwarf, onvalue=True, offvalue=False).grid(row=6, column=1)    
+        Checkbutton(boolFrame, text='', variable= isHillDwarf, onvalue=True, offvalue=False).grid(row=6, column=1)    
         
         useAverage = BooleanVar()
-        self.averageLabel = Label(afterFrame, text="Use Average Values Instead of Rolling Dice?")
+        self.averageLabel = Label(boolFrame, text="Use Average Values?")
         self.averageLabel.grid(row=7, column=0, padx=5)
-        Checkbutton(afterFrame, text='', variable= useAverage, onvalue=True, offvalue=False).grid(row=7, column=1)    
+        Checkbutton(boolFrame, text='', variable= useAverage, onvalue=True, offvalue=False).grid(row=7, column=1)    
         
-        Button(afterFrame, text="Calculate", command=CalculateHitpoints).grid(row=8, column=3, columnspan=2)       
-        
+        buttonFrame = Frame(self)
+        buttonFrame.pack(padx = 350, pady=5, side='top', anchor='w')
+        Button(buttonFrame, text="Calculate", command=CalculateHitpoints).grid(row=0, column=0)
+
         global hpResultField
-        hpResultField = Text(self, height=10, width=40)
-        hpResultField.pack(pady=5)
-         
+        hpResultField = Text(self, height=5, width=20)
+        hpResultField.pack(padx = 50, pady=5, side='top', anchor='w')
                 
 class MainView(Frame):
     def __init__(self, *args, **kwargs):
@@ -248,5 +252,4 @@ if __name__ == "__main__":
     main = MainView(root)
     main.pack(side="top", fill="both", expand=True)
     root.wm_geometry("800x800")
-
     root.mainloop()
